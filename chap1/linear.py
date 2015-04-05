@@ -11,6 +11,21 @@ class Linear(object):
 
     def remove(self, index):
         raise NotImplemented
+    
+    def travel(self):
+        raise NotImplemented
+
+    def find(self, index):
+        raise NotImplemented
+    
+    def index(self, e):
+        raise NotImplemented
+
+    def prior(self, e):
+        raise NotImplemented
+
+    def next(self, e):
+        raise NotImplemented
 
 class SequenceList(Linear):
     
