@@ -1,7 +1,18 @@
 #!/bin/env python
 #coding:utf-8
 
-class SequenceLinear(object):
+class Linear(object):
+
+    def list(self):
+        raise NotImplemented
+
+    def insert(self, e, index):
+        raise NotImplemented
+
+    def remove(self, index):
+        raise NotImplemented
+
+class SequenceList(Linear):
     
     def __init__(self, *elements):
         self._physical_storage = list(elements)
@@ -42,4 +53,88 @@ class SequenceLinear(object):
             index += 1
         else:
             self._mallocate(-1)
+
+class SingleLinkedList(Linear):
+   
+    class Node(object):
+        
+        def __init__(self, _data, _next=None):
+            self._data = _data
+            self._next = _next
+
+        @property
+        def data(self):
+            return self._data
+
+        def _get_next(self):
+            return self._next
+        
+        def _set_next(self, _next):
+            self._next = _next
+
+        next = property(_get_next, _set_next)
+
+        def __str__(self):
+            return ','.join([unicode(self.data), str(self.next or 'None')])
+
+        def __repr__(self):
+            return self.__str__()
+
+    def __init__(self, *elements):
+        assert elements
+        header = None
+        last = None
+        for e in elements:
+            current = self.Node(e)
+            if last:
+                last.next = current
+            if not header:
+                header = current
+            last = current
+        self._header = header
+
+    @property
+    def header(self):
+        return self._header
+
+    def travel(self):
+        current = None
+        while 1:
+            current = self.header if not current else current.next
+            if current:
+                yield current
+            else:
+                raise StopIteration
+
+    def list(self):
+        return [e for e in self.travel()]
+
+    def insert(self, e, index):
+        pre, next = None, self.header
+        while index>0:
+            pre, next = next, next.next
+            if not next:
+                index = 0
+            else:
+                index -= 1
+        else:
+            new_node = self.Node(e, next)
+            if pre:
+                pre.next = new_node
+            else:
+                self._header = new_node
+
+    def remove(self, index):
+        pre, dnode = None, self.header
+        while index>0:
+            pre, dnode = dnode, dnode.next
+            if dnode:
+                index -= 1
+            else:
+                index = 0
+        else:
+            if pre:
+                pre.next = dnode.next
+            else:
+                self._header = dnode.next
 
