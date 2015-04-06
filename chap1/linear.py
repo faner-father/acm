@@ -26,11 +26,15 @@ class Linear(object):
 
     def next(self, e):
         raise NotImplemented
+    
+    def size(self):
+        pass
 
 class SequenceList(Linear):
     
     def __init__(self, *elements):
         self._physical_storage = list(elements)
+        self._size = len(self._physical_storage)
 
     def travel(self):
         for e in self._physical_storage:
@@ -45,6 +49,11 @@ class SequenceList(Linear):
             self._physical_storage = (
                 self._physical_storage[:len(self._physical_storage)-size]
                 )
+        self._size = len(self._physical_storage)
+
+    @property
+    def size(self):
+        return self._size
 
     def list(self):
         return self._physical_storage[:]
@@ -58,16 +67,32 @@ class SequenceList(Linear):
             endIndex -= 1
         else:
             self._physical_storage[index] = e
-        #return self._physical_storage[:]
     
     def remove(self, index):
         assert all((isinstance(index, int), (len(self._physical_storage)> index >= 0)))
         endIndex = len(self._physical_storage) - 1
+        rev = self._physical_storage[index]
         while endIndex > index:
             self._physical_storage[index] = self._physical_storage[index+1]
             index += 1
         else:
             self._mallocate(-1)
+        return rev
+    
+    def index(self, e):
+        index = 0
+        for o in self.travel():
+            if e==o:
+                print 'loop:{} times!'.format(index+1)
+                return index
+            index += 1
+        else:
+            print 'loop:{} times!'.format(index)
+            return -1
+    
+    def find(self, index):
+        assert index < self.size
+        return self._physical_storage[index]
 
 class SingleLinkedList(Linear):
    
@@ -152,4 +177,64 @@ class SingleLinkedList(Linear):
                 pre.next = dnode.next
             else:
                 self._header = dnode.next
+    
+    def index(self, e):
+        index = 0
+        for o in self.travel():
+            if e==o.data:
+                print 'loop:{} times'.format(index+1)
+                return index
+            index += 1
+        else:
+            print 'loop:{} times'.format(index)
+            return -1
+
+class Stack(object):
+
+    def is_empty(self):
+        pass
+
+    def is_full(self):
+        pass
+
+    def push(self, e):
+        pass
+
+    def pop(self):
+        pass
+
+    def top(self):
+        pass
+
+debug = lambda :__import__('pdb').set_trace()
+
+class SequenceStack(Stack, SequenceList):
+    
+    def __init__(self):
+        SequenceList.__init__(self)
+    
+    def is_empty(self):
+        return self.size == 0
+
+    def is_full(self):
+        return False
+
+    def push(self, e):
+        self.insert(e, self.size)
+
+    def pop(self):
+        assert not self.is_empty()
+        return self.remove(self.size-1)
+
+    def top(self):
+        return self.find(self.size-1) if not self.is_empty() else None
+
+class LinkedStack(Stack):
+
+    pass
+
+class Queue(object):
+
+    pass
+
 
